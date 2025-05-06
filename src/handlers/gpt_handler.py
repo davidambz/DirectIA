@@ -6,7 +6,7 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_test_message() -> str:
+def generate_message() -> str:
     system_prompt = os.getenv("GPT_SYSTEM_PROMPT")
     user_prompt = os.getenv("GPT_USER_PROMPT")
 
