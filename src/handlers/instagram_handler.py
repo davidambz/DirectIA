@@ -1,5 +1,6 @@
 import os
 import time
+import re
 from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -61,39 +62,61 @@ def extract_profile_data(driver, username: str) -> dict:
     time.sleep(5)
 
     try:
-        # Clica em todos os botões 'more' ou 'ver mais'
-        more_buttons = driver.find_elements(By.XPATH, "//button[text()='more' or text()='ver mais']")
+        header = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "header"))
+        )
+
+        # Clica nos botões "more" ou "ver mais"
+        more_buttons = header.find_elements(By.XPATH, ".//button[text()='more' or text()='ver mais']")
         for btn in more_buttons:
             try:
                 btn.click()
                 time.sleep(1)
             except:
-                pass  # ignora erros se não conseguir clicar
+                pass
 
-        # Aguarda o header carregar
-        header = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.TAG_NAME, "header"))
-        )
+        # Extrai o nome (fica na tag h1 ou h2)
+        try:
+            name_element = header.find_element(By.XPATH, ".//h1 | .//h2")
+            name = name_element.text.strip()
+        except:
+            name = ""
 
-        # Encontra todas as <section> dentro do header
+        # Extrai todas as sections do header
         sections = header.find_elements(By.TAG_NAME, "section")
+
+        # Seção onde geralmente está a bio e o link
+        bio = ""
+        link = ""
 
         if len(sections) >= 4:
             fourth_section = sections[3]
-            section_text = fourth_section.text.strip()
-        else:
-            section_text = "Menos de 4 sections no header."
+            lines = fourth_section.text.strip().split("\n")
+
+            # Remove "Followed by" se existir
+            lines = [line for line in lines if not line.lower().startswith("followed by")]
+
+            # Se a última linha for link, separa
+            if lines and re.match(r"(https?:\/\/|beacons\.|linktr\.|bio\.link)", lines[-1]):
+                link = lines.pop()
+
+            bio = "\n".join(lines)
 
         return {
             "username": username,
-            "header_section_4": section_text
+            "nome": name,
+            "bio": bio,
+            "link": link
         }
 
     except Exception as e:
         print(f"Erro ao extrair dados de {username}: {e}")
         return {
             "username": username,
-            "header_section_4": f"Erro: {e}"
+            "nome": "",
+            "bio": "",
+            "link": "",
+            "erro": str(e)
         }
     
 def send_messages_to_users(usernames: list[str], message: str):
