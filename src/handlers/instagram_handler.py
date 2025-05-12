@@ -105,3 +105,15 @@ def send_message_from_profile(driver, message):
         print("✅ Mensagem enviada com sucesso.")
     except Exception as e:
         print(f"❌ Erro ao tentar enviar mensagem: {e}")
+
+def follow_user_from_profile(driver):
+    try:
+        follow_buttons = driver.find_elements(By.XPATH, "//div[text()='Follow' or text()='Seguir']")
+        if follow_buttons:
+            follow_buttons[0].click()
+            time.sleep(2)
+            print("👤 Seguido com sucesso.")
+        else:
+            print("✅ Já está seguindo ou botão de seguir não encontrado.")
+    except Exception as e:
+        print(f"❌ Erro ao tentar seguir: {e}")
