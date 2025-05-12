@@ -88,8 +88,12 @@ def extract_profile_data_from_header(header, username: str) -> dict:
 
 def send_message_from_profile(driver, message):
     try:
-        message_button = driver.find_element(By.XPATH, "//div[text()='Message']")
-        message_button.click()
+        message_buttons = driver.find_elements(By.XPATH, "//div[text()='Message']")
+        if not message_buttons:
+            print("⚠️ Perfil não permite envio de mensagens ou está bloqueado. Pulando...")
+            return
+
+        message_buttons[0].click()
         time.sleep(5)
 
         wait = WebDriverWait(driver, 10)
@@ -98,6 +102,6 @@ def send_message_from_profile(driver, message):
         message_box.send_keys(message)
         message_box.send_keys(Keys.ENTER)
         time.sleep(5)
-        print(f"Mensagem enviada com sucesso.")
+        print("✅ Mensagem enviada com sucesso.")
     except Exception as e:
-        print(f"Erro ao tentar enviar mensagem: {e}")
+        print(f"❌ Erro ao tentar enviar mensagem: {e}")
