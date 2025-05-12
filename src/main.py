@@ -1,12 +1,12 @@
 from handlers.file_handler import read_usernames_from_file
-from handlers.instagram_handler import create_driver, login, extract_profile_data, send_message
+from handlers.instagram_handler import create_driver, login, open_profile, extract_profile_data_from_header, send_message_from_profile
 from handlers.gpt_handler import generate_message
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+from pathlib import Path
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-# ⚙️ Configurações de controle via .env
 use_gpt = os.getenv("USE_GPT", "false").lower() == "true"
 send = os.getenv("SEND_MESSAGES", "false").lower() == "true"
 
@@ -20,11 +20,14 @@ if __name__ == "__main__":
     try:
         login(driver)
         for username in usernames:
-            print(f"\n🔍 Processando {username}...")
+            print(f"\n🔍 Acessando perfil: {username}")
+            header = open_profile(driver, username)
+            if not header:
+                continue
 
-            profile = extract_profile_data(driver, username)
+            profile = extract_profile_data_from_header(header, username)
             if profile.get("erro"):
-                print(f"❌ Erro ao processar {username}: {profile['erro']}")
+                print(f"❌ Erro ao extrair dados de {username}: {profile['erro']}")
                 continue
 
             print("✅ Dados extraídos:")
@@ -42,7 +45,7 @@ if __name__ == "__main__":
 
             if send:
                 print("📤 Enviando mensagem...")
-                send_message(driver, username, message)
+                send_message_from_profile(driver, message)
             else:
                 print("🚫 Envio desativado (SEND_MESSAGES = false)")
 
