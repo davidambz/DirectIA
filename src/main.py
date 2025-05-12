@@ -1,10 +1,14 @@
 from handlers.file_handler import read_usernames_from_file
 from handlers.instagram_handler import create_driver, login, extract_profile_data, send_message
 from handlers.gpt_handler import generate_message
+from dotenv import load_dotenv
+import os
 
-# ⚙️ Configurações de controle
-use_gpt = False  # Altere para True para ativar a API do ChatGPT
-send = False     # Altere para True para enviar mensagens reais
+load_dotenv()
+
+# ⚙️ Configurações de controle via .env
+use_gpt = os.getenv("USE_GPT", "false").lower() == "true"
+send = os.getenv("SEND_MESSAGES", "false").lower() == "true"
 
 if __name__ == "__main__":
     usernames = read_usernames_from_file("src/data/profiles.txt")
@@ -40,7 +44,7 @@ if __name__ == "__main__":
                 print("📤 Enviando mensagem...")
                 send_message(driver, username, message)
             else:
-                print("🚫 Envio desativado (send = False)")
+                print("🚫 Envio desativado (SEND_MESSAGES = false)")
 
     finally:
         driver.quit()
