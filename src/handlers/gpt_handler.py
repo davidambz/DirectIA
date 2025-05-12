@@ -17,8 +17,7 @@ def generate_message(profile: dict) -> str:
         f"Username: {profile['username']}\n"
         f"Bio: {profile['bio']}\n"
         f"Link: {profile['link']}\n\n"
-        f"A mensagem deve ser simpática e parecer uma conversa comum, mas com a intenção de descobrir se a pessoa tem interesse em vender o carro que possui ou já teve. "
-        f"Evite linguagem robótica ou clichês de vendas. Use uma abordagem humana e contextualize com base na bio, se possível."
+        f"Evite linguagem robótica, clichês ou tom comercial agressivo. Use uma abordagem humana, amigável e contextualize com base na bio, se possível."
     )
 
     response = client.chat.completions.create(
