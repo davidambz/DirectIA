@@ -52,21 +52,14 @@ def open_profile(driver, username: str):
 
 def extract_profile_data_from_header(header, username: str) -> dict:
     try:
-        # Clica em "ver mais"
-        more_buttons = header.find_elements(By.XPATH, ".//button[text()='more' or text()='ver mais']")
-        for btn in more_buttons:
-            try:
-                btn.click()
-                time.sleep(1)
-            except:
-                pass
-
+        # Extrai nome
         try:
             name_element = header.find_element(By.XPATH, ".//h1 | .//h2")
             name = name_element.text.strip()
         except:
             name = ""
 
+        # Extrai bio e link
         sections = header.find_elements(By.TAG_NAME, "section")
         bio, link = "", ""
 
