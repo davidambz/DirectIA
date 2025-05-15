@@ -104,6 +104,37 @@ O sistema acessa o perfil de cada usuário listado, extrai os dados, gera uma me
 
 ---
 
+## 🛠️ Como gerar um executável
+
+Você pode gerar um executável para Windows ou Linux usando o PyInstaller.
+
+### ✅ Windows (`.exe`):
+
+No terminal do Windows:
+
+```bash
+poetry run pyinstaller --noconfirm --onefile --name mensageiro src/main.py
+```
+
+O arquivo `dist/mensageiro.exe` será gerado.
+
+### ✅ Linux / WSL (binário Linux):
+
+No terminal do WSL:
+
+```bash
+poetry run pyinstaller --noconfirm --onefile --name mensageiro src/main.py
+```
+
+O binário `dist/mensageiro` será gerado (executável Linux).
+
+### 📝 Observações:
+- O executável gerado usa os arquivos `.env` e `profiles.txt` que devem estar no local esperado.
+- Para empacotar o projeto, basta zipar o `.exe`, `.env-example` e `src/data/profiles.txt`.
+- O `.spec` e os arquivos de build (`dist/`, `build/`) são ignorados no controle de versão.
+
+---
+
 ## 🛡️ Avisos
 
 - Use com responsabilidade. Automação no Instagram pode violar os termos da plataforma.
