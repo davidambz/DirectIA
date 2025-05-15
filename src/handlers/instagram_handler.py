@@ -88,7 +88,10 @@ def extract_profile_data_from_header(header, username: str) -> dict:
 
 def send_message_from_profile(driver, message):
     try:
-        message_buttons = driver.find_elements(By.XPATH, "//div[text()='Message']")
+        message_buttons = driver.find_elements(
+        By.XPATH,
+        "//div[text()='Message' or text()='Enviar mensagem']"
+    )
         if not message_buttons:
             print("⚠️ Perfil não permite envio de mensagens ou está bloqueado. Pulando...")
             return
