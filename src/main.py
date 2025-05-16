@@ -49,12 +49,14 @@ if __name__ == "__main__":
                 message = generate_message(profile)
             else:
                 message = "Esta é uma mensagem de teste para evitar o uso da API."
-
+            
             print(f"✉️ Mensagem: {message}")
+
+            follow_user_from_profile(driver)
+
             if send:
                 send_message_from_profile(driver, message)
 
-            follow_user_from_profile(driver)
             print()
     finally:
         driver.quit()
