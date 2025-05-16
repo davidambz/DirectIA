@@ -114,13 +114,9 @@ def follow_user_from_profile(driver):
         header = driver.find_element(By.TAG_NAME, "header")
         buttons = header.find_elements(By.TAG_NAME, "button")
 
-        print("🔍 Botões encontrados no header:")
         for btn in buttons:
             texto = btn.text.strip()
-            print(f"→ Botão: '{texto}'")
-
             if texto in ["Seguir", "Seguir de volta", "Follow", "Follow back"]:
-                print(f"✅ Clicando no botão: {texto}")
                 btn.click()
                 time.sleep(2)
                 print("👤 Seguido com sucesso.")
