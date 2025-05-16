@@ -13,3 +13,4 @@ dist/
 *.sqlite
 *.log
 *.db
+*.spec
