@@ -1,7 +1,19 @@
 import csv
 import os
+import sys
 
-def read_usernames_from_file(filepath: str) -> list[str]:
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        # Executável (.exe)
+        return os.path.dirname(sys.executable)
+    else:
+        # Script rodando no modo normal
+        return os.path.dirname(os.path.abspath(__file__))
+
+def read_usernames_from_file(filename: str) -> list[str]:
+    base_path = get_base_path()
+    filepath = os.path.join(base_path, filename)
+
     if not os.path.exists(filepath):
         raise FileNotFoundError(f"Arquivo não encontrado: {filepath}")
 

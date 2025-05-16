@@ -1,4 +1,3 @@
-from handlers.file_handler import read_usernames_from_file
 from handlers.instagram_handler import (
     create_driver,
     login,
@@ -7,61 +6,55 @@ from handlers.instagram_handler import (
     send_message_from_profile,
     follow_user_from_profile
 )
+from handlers.file_handler import read_usernames_from_file
 from handlers.gpt_handler import generate_message
-from dotenv import load_dotenv
 import os
-from pathlib import Path
+import sys
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
-
-# ⚙️ Flags de controle via .env
-use_gpt = os.getenv("USE_GPT", "false").lower() == "true"
-send = os.getenv("SEND_MESSAGES", "false").lower() == "true"
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == "__main__":
-    usernames = read_usernames_from_file("src/data/profiles.txt")
+    print()
+    use_gpt = os.getenv("USE_GPT", "false").lower() == "true"
+    send = os.getenv("SEND_MESSAGES", "false").lower() == "true"
 
-    print(f"\n🔧 GPT ativado: {use_gpt}")
+    print(f"🔧 GPT ativado: {use_gpt}")
     print(f"📤 Envio ativado: {send}")
+    print()
+
+    base_path = get_base_path()
+    profiles_path = os.path.join(base_path, "profiles.txt")
+
+    usernames = read_usernames_from_file("profiles.txt")
 
     driver = create_driver()
     try:
         login(driver)
+
         for username in usernames:
-            print(f"\n🔍 Acessando perfil: {username}")
+            print(f"🔍 Acessando perfil: {username}")
             header = open_profile(driver, username)
             if not header:
-                print(f"❌ Não foi possível carregar o perfil de {username}")
                 continue
 
             profile = extract_profile_data_from_header(header, username)
             if profile.get("erro"):
-                print(f"❌ Erro ao extrair dados de {username}: {profile['erro']}")
+                print(f"❌ Erro ao extrair perfil de {username}: {profile['erro']}")
                 continue
 
-            print("✅ Dados extraídos:")
-            for k, v in profile.items():
-                print(f"{k}: {v}")
-
-            # Seguir o perfil se necessário
-            follow_user_from_profile(driver)
-
-            # Geração da mensagem
             if use_gpt:
-                print("\n🤖 Gerando mensagem personalizada com GPT...")
                 message = generate_message(profile)
             else:
-                print("\n💬 Usando mensagem padrão para testes (API desativada)")
-                message = "Olá! Essa é uma mensagem padrão enviada para teste, sem uso da API do ChatGPT."
+                message = "Esta é uma mensagem de teste para evitar o uso da API."
 
-            print(f"\n✉️ Mensagem gerada:\n{message}")
-
-            # Envio da mensagem
+            print(f"✉️ Mensagem: {message}")
             if send:
-                print("📤 Enviando mensagem...")
                 send_message_from_profile(driver, message)
-            else:
-                print("🚫 Envio desativado (SEND_MESSAGES = false)")
 
+            follow_user_from_profile(driver)
+            print()
     finally:
         driver.quit()
