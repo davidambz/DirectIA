@@ -111,14 +111,16 @@ def send_message_from_profile(driver, message):
 
 def follow_user_from_profile(driver):
     try:
-        # Encontra o <header> do perfil
         header = driver.find_element(By.TAG_NAME, "header")
         buttons = header.find_elements(By.TAG_NAME, "button")
 
-        # Verifica os textos permitidos
+        print("🔍 Botões encontrados no header:")
         for btn in buttons:
-            texto = btn.text.strip().lower()
-            if texto in ["seguir", "seguir de volta", "follow", "follow back"]:
+            texto = btn.text.strip()
+            print(f"→ Botão: '{texto}'")
+
+            if texto in ["Seguir", "Seguir de volta", "Follow", "Follow back"]:
+                print(f"✅ Clicando no botão: {texto}")
                 btn.click()
                 time.sleep(2)
                 print("👤 Seguido com sucesso.")
