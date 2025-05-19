@@ -35,7 +35,7 @@ if __name__ == "__main__":
     try:
         login(driver)
 
-        for username in usernames:
+        for i, username in enumerate(usernames):
             print(f"🔍 Acessando perfil: {username}")
             header = open_profile(driver, username)
             if not header:
@@ -49,9 +49,11 @@ if __name__ == "__main__":
             follow_user_from_profile(driver)
             send_message_from_profile(driver, profile)
 
-            delay = random.randint(60, 90)
-            print(f"⏳ Aguardando {delay} segundos antes de prosseguir para o próximo perfil...")
-            human_sleep(delay, delay)
-            print()
+            if i < len(usernames) - 1:
+                delay = random.randint(60, 90)
+                print(f"⏳ Aguardando {delay} segundos antes de prosseguir para o próximo perfil...")
+                human_sleep(delay, delay)
+                print()
     finally:
         driver.quit()
+        print("✅ Fim do processo.")
