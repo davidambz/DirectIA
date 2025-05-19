@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from handlers.time_handler import human_sleep  # ✅ Importa a função humanizada
+from handlers.time_handler import human_sleep
 
 load_dotenv()
 
@@ -52,14 +52,12 @@ def open_profile(driver, username: str):
 
 def extract_profile_data_from_header(header, username: str) -> dict:
     try:
-        # Extrai nome
         try:
             name_element = header.find_element(By.XPATH, ".//h1 | .//h2")
             name = name_element.text.strip()
         except:
             name = ""
 
-        # Extrai bio e link
         sections = header.find_elements(By.TAG_NAME, "section")
         bio, link = "", ""
 

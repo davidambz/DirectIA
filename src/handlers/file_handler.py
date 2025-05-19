@@ -4,10 +4,8 @@ import sys
 
 def get_base_path():
     if getattr(sys, 'frozen', False):
-        # Executável (.exe)
         return os.path.dirname(sys.executable)
     else:
-        # Script rodando no modo normal
         return os.path.dirname(os.path.abspath(__file__))
 
 def read_usernames_from_file(filename: str) -> list[str]:
