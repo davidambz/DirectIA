@@ -7,7 +7,6 @@ from handlers.instagram_handler import (
     follow_user_from_profile
 )
 from handlers.file_handler import read_usernames_from_file
-from handlers.gpt_handler import generate_message
 from handlers.time_handler import human_sleep
 import os
 import sys
@@ -47,17 +46,8 @@ if __name__ == "__main__":
                 print(f"❌ Erro ao extrair perfil de {username}: {profile['erro']}")
                 continue
 
-            if use_gpt:
-                message = generate_message(profile)
-            else:
-                message = "Esta é uma mensagem de teste para evitar o uso da API."
-            
-            print(f"✉️ Mensagem: {message}")
-
             follow_user_from_profile(driver)
-
-            if send:
-                send_message_from_profile(driver, message)
+            send_message_from_profile(driver, profile)
 
             delay = random.randint(60, 90)
             print(f"⏳ Aguardando {delay} segundos antes de prosseguir para o próximo perfil...")

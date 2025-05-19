@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from handlers.time_handler import human_sleep
+from handlers.gpt_handler import generate_message
 
 load_dotenv()
 
@@ -84,14 +85,28 @@ def extract_profile_data_from_header(header, username: str) -> dict:
             "erro": str(e)
         }
 
-def send_message_from_profile(driver, message):
+def send_message_from_profile(driver, profile):
     try:
+        use_gpt = os.getenv("USE_GPT", "false").lower() == "true"
+        send = os.getenv("SEND_MESSAGES", "false").lower() == "true"
+
         message_buttons = driver.find_elements(
             By.XPATH,
             "//div[text()='Message' or text()='Enviar mensagem']"
         )
         if not message_buttons:
             print("⚠️ Perfil não permite envio de mensagens ou está bloqueado. Pulando...")
+            return
+
+        if use_gpt:
+            message = generate_message(profile)
+        else:
+            message = "Esta é uma mensagem de teste para evitar o uso da API."
+
+        print(f"✉️ Mensagem: {message}")
+
+        if not send:
+            print("📭 Modo de envio desativado. Mensagem não enviada.")
             return
 
         message_buttons[0].click()
