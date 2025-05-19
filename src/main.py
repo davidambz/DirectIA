@@ -8,8 +8,10 @@ from handlers.instagram_handler import (
 )
 from handlers.file_handler import read_usernames_from_file
 from handlers.gpt_handler import generate_message
+from handlers.time_handler import human_sleep
 import os
 import sys
+import random  # ✅ Importado para gerar delays
 
 def get_base_path():
     if getattr(sys, 'frozen', False):
@@ -57,6 +59,10 @@ if __name__ == "__main__":
             if send:
                 send_message_from_profile(driver, message)
 
+            # ✅ Delay real entre perfis com valor exato mostrado
+            delay = random.randint(60, 90)
+            print(f"⏳ Aguardando {delay} segundos antes de prosseguir para o próximo perfil...")
+            human_sleep(delay, delay)
             print()
     finally:
         driver.quit()
