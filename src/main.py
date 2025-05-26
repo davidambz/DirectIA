@@ -21,6 +21,7 @@ if __name__ == "__main__":
     print()
     use_gpt = os.getenv("USE_GPT", "false").lower() == "true"
     send = os.getenv("SEND_MESSAGES", "false").lower() == "true"
+    follow = os.getenv("FOLLOW_USERS", "false").lower() == "true"
 
     print(f"🔧 GPT ativado: {use_gpt}")
     print(f"📤 Envio ativado: {send}")
@@ -46,7 +47,9 @@ if __name__ == "__main__":
                 print(f"❌ Erro ao extrair perfil de {username}: {profile['erro']}")
                 continue
 
-            follow_user_from_profile(driver)
+            if follow:
+                follow_user_from_profile(driver)
+
             send_message_from_profile(driver, profile)
 
             if i < len(usernames) - 1:
