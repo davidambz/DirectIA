@@ -1,4 +1,4 @@
-# Projeto
+# DirectAI
 
 Automação para envio de mensagens personalizadas via Instagram com base em perfis públicos.
 
@@ -28,10 +28,10 @@ O projeto utiliza Selenium para acessar perfis do Instagram, extrair informaçõ
 
 ## ⚙️ Como configurar
 
-```bash
+```
 # Clone o repositório
-git clone https://github.com/davidambz/thps.git
-cd thps
+git clone https://github.com/davidambz/DirectAI.git
+cd DirectAI
 
 # Instale o Poetry (caso ainda não tenha)
 pip install poetry
@@ -48,7 +48,7 @@ Crie um arquivo `.env` na raiz com base no `.env-example` incluído no projeto.
 
 Exemplo de `.env`:
 
-```env
+```
 INSTAGRAM_USER=seu_usuario
 INSTAGRAM_PASS=sua_senha
 OPENAI_API_KEY=sua_chave_openai
@@ -58,14 +58,15 @@ GPT_USER_PROMPT=Sou alguém oferecendo um serviço personalizado e quero iniciar
 
 USE_GPT=true
 SEND_MESSAGES=false
+FOLLOW_USERS=true
 ```
 
 ---
 
 ## 📁 Estrutura do projeto
 
-```bash
-projeto/
+```
+DirectAI/
 ├── src/
 │   ├── main.py
 │   ├── data/
@@ -88,16 +89,17 @@ projeto/
 2. Configure seu `.env` com base no `.env-example`.  
 3. Execute o projeto:
 
-```bash
+```
 # Rodar em modo teste (sem envio e sem GPT)
 poetry run python src/main.py
 ```
 
 4. Para ativar o envio e a geração com GPT, configure no `.env`:
 
-```env
+```
 USE_GPT=true
 SEND_MESSAGES=true
+FOLLOW_USERS=true
 ```
 
 O sistema acessa o perfil de cada usuário listado, extrai os dados, gera uma mensagem personalizada com até 300 caracteres e envia via DM (caso ativado).
@@ -112,21 +114,21 @@ Você pode gerar um executável para Windows ou Linux usando o PyInstaller.
 
 No terminal do Windows:
 
-```bash
-poetry run pyinstaller --noconfirm --onefile --name mensageiro src/main.py
+```
+poetry run pyinstaller --noconfirm --onefile --name DirectAI src/main.py
 ```
 
-O arquivo `dist/mensageiro.exe` será gerado.
+O arquivo `dist/DirectAI.exe` será gerado.
 
 ### ✅ Linux / WSL (binário Linux):
 
 No terminal do WSL:
 
-```bash
-poetry run pyinstaller --noconfirm --onefile --name mensageiro src/main.py
+```
+poetry run pyinstaller --noconfirm --onefile --name DirectAI src/main.py
 ```
 
-O binário `dist/mensageiro` será gerado (executável Linux).
+O binário `dist/DirectAI` será gerado (executável Linux).
 
 ### 📝 Observações:
 - O executável gerado usa os arquivos `.env` e `profiles.txt` que devem estar no local esperado.
@@ -137,5 +139,5 @@ O binário `dist/mensageiro` será gerado (executável Linux).
 
 ## 🛡️ Avisos
 
-- Use com responsabilidade. Automação no Instagram pode violar os termos da plataforma.
+- Use com responsabilidade. Automação no Instagram pode violar os termos da plataforma.  
 - Mantenha seu uso limitado e evite spam.
