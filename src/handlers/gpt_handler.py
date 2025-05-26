@@ -12,10 +12,11 @@ def generate_message(profile: dict) -> str:
 
     user_prompt = (
         f"{user_context}\n\n"
-        f"Com base no perfil abaixo, escreva uma mensagem personalizada e simpática com até 300 caracteres. "
+        f"Com base no perfil abaixo, escreva uma mensagem personalizada, simpática e com até 300 caracteres. "
         f"A mensagem deve ter apenas um parágrafo, parecer uma conversa natural e caber numa única mensagem de Instagram Direct. "
-        f"Evite linguagem robótica, **não use emojis, nem símbolos como ✨, ❤️ ou similares**, e evite terminar com reticências. "
-        f"Finalize sempre com uma saudação curta como 'Abraço!' ou 'Até mais!'.\n\n"
+        f"Evite emojis, linguagem robótica, reticências ou símbolos como ✨, ❤️ ou similares. "
+        f"Você pode usar informações do perfil para deixar a abordagem mais pessoal, "
+        f"mas a pergunta no final deve estar alinhada ao meu objetivo descrito acima, mantendo o assunto principal da conversa de acordo com meu contexto.\n\n"
         f"Nome: {profile['nome']}\n"
         f"Username: {profile['username']}\n"
         f"Bio: {profile['bio']}\n"
