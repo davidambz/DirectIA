@@ -1,26 +1,29 @@
 import csv
 import os
-import sys
 
 def get_base_path():
-    if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
-    else:
-        return os.path.dirname(os.path.abspath(__file__))
+    # Vai até a raiz do projeto, subindo 2 níveis
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 def read_usernames_from_file(filename: str) -> list[str]:
     base_path = get_base_path()
+
     filepath = os.path.join(base_path, filename)
+    dev_path = os.path.join(base_path, "src", "data", filename)
 
-    if not os.path.exists(filepath):
-        raise FileNotFoundError(f"Arquivo não encontrado: {filepath}")
+    if os.path.exists(filepath):
+        final_path = filepath
+    elif os.path.exists(dev_path):
+        final_path = dev_path
+    else:
+        raise FileNotFoundError(f"Arquivo não encontrado: {filepath} ou {dev_path}")
 
-    _, ext = os.path.splitext(filepath)
+    _, ext = os.path.splitext(final_path)
 
     if ext.lower() == ".txt":
-        return _read_from_txt(filepath)
+        return _read_from_txt(final_path)
     elif ext.lower() == ".csv":
-        return _read_from_csv(filepath)
+        return _read_from_csv(final_path)
     else:
         raise ValueError("Formato de arquivo não suportado. Use .txt ou .csv.")
 
