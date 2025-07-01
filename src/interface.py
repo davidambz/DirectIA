@@ -1,100 +1,81 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox, scrolledtext
 import os
-from dotenv import set_key
-import threading
 import subprocess
+from tkinter import filedialog, StringVar, BooleanVar
+import ttkbootstrap as tb
+from ttkbootstrap.constants import *
 
-ENV_PATH = ".env"
+ENV_PATH = os.path.join(os.path.dirname(__file__), "..", ".env")
 
+class DirectIAInterface:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("DirectIA")
+        self.style = tb.Style("superhero")
 
-def salvar_env(campo, valor):
-    set_key(ENV_PATH, campo, valor)
+        self.fields = {
+            "Usuário do Instagram": StringVar(),
+            "Senha do Instagram": StringVar(),
+            "Chave da OpenAI": StringVar(),
+            "Resumo do comportamento da IA": StringVar(),
+        }
 
+        self.user_prompt_text = None
+        self.use_gpt = BooleanVar()
+        self.send_messages = BooleanVar()
+        self.follow_users = BooleanVar()
+        self.selected_file_path = ""
+        self.selected_file_label = None
 
-def selecionar_arquivo():
-    caminho = filedialog.askopenfilename(
-        filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv")]
-    )
-    if caminho:
-        salvar_env("PROFILE_FILE", os.path.basename(caminho))
-        entrada_arquivo.delete(0, tk.END)
-        entrada_arquivo.insert(0, os.path.basename(caminho))
+        self._create_widgets()
 
+    def _create_widgets(self):
+        container = tb.Frame(self.root, padding=20)
+        container.pack(fill=BOTH, expand=True)
 
-def iniciar_processamento():
-    botao_iniciar.config(state=tk.DISABLED)
-    texto_logs.insert(tk.END, "\n⏳ Iniciando processamento...\n")
+        for label_text, var in self.fields.items():
+            tb.Label(container, text=label_text).pack(anchor="w", pady=(10, 0))
+            entry_show = "*" if "Senha" in label_text else ""
+            tb.Entry(container, textvariable=var, show=entry_show).pack(fill=X)
 
-    def run():
-        try:
-            subprocess.run(["python", "src/main.py"], check=True)
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror("Erro", str(e))
-        finally:
-            botao_iniciar.config(state=tk.NORMAL)
-            texto_logs.insert(tk.END, "\n✅ Finalizado.\n")
+        tb.Label(container, text="Mensagem de apresentação").pack(anchor="w", pady=(10, 0))
+        self.user_prompt_text = tb.Text(container, height=4)
+        self.user_prompt_text.pack(fill=BOTH, pady=(0, 10))
 
-    threading.Thread(target=run).start()
+        tb.Checkbutton(container, text="Usar inteligência artificial", variable=self.use_gpt).pack(anchor="w")
+        tb.Checkbutton(container, text="Enviar mensagens automaticamente", variable=self.send_messages).pack(anchor="w")
+        tb.Checkbutton(container, text="Seguir perfis automaticamente", variable=self.follow_users).pack(anchor="w")
 
+        tb.Button(container, text="Selecionar lista de perfis", command=self.select_profile_file).pack(anchor="w", pady=(15, 0))
+        self.selected_file_label = tb.Label(container, text="Nenhum arquivo selecionado", font=("Arial", 8, "italic"))
+        self.selected_file_label.pack(anchor="w", pady=(2, 10))
 
-def atualizar_env_e_salvar():
-    salvar_env("INSTAGRAM_USER", entrada_user.get())
-    salvar_env("INSTAGRAM_PASS", entrada_senha.get())
-    salvar_env("OPENAI_API_KEY", entrada_api.get())
-    salvar_env("GPT_USER_PROMPT", entrada_prompt.get())
-    salvar_env("USE_GPT", str(var_gpt.get()))
-    salvar_env("SEND_MESSAGES", str(var_enviar.get()))
-    salvar_env("FOLLOW_USERS", str(var_seguir.get()))
-    messagebox.showinfo("Salvo", "Configurações atualizadas.")
+        tb.Button(container, text="Iniciar", bootstyle="success", command=self._save_and_run).pack(fill=X, pady=(20, 0))
 
+    def select_profile_file(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Arquivos de texto", "*.txt *.csv")]
+        )
+        if file_path:
+            self.selected_file_path = file_path
+            file_name = os.path.basename(file_path)
+            self.selected_file_label.config(text=f"Arquivo selecionado: {file_name}")
 
-janela = tk.Tk()
-janela.title("DirectIA - Interface")
-janela.geometry("580x600")
+    def _save_and_run(self):
+        with open(ENV_PATH, "w", encoding="utf-8") as f:
+            f.write(f"INSTAGRAM_USER={self.fields['Usuário do Instagram'].get()}\n")
+            f.write(f"INSTAGRAM_PASS={self.fields['Senha do Instagram'].get()}\n")
+            f.write(f"OPENAI_API_KEY={self.fields['Chave da OpenAI'].get()}\n")
+            f.write(f"GPT_SYSTEM_PROMPT={self.fields['Resumo do comportamento da IA'].get()}\n")
+            f.write(f"GPT_USER_PROMPT={self.user_prompt_text.get('1.0', 'end').strip()}\n")
+            f.write(f"USE_GPT={'true' if self.use_gpt.get() else 'false'}\n")
+            f.write(f"SEND_MESSAGES={'true' if self.send_messages.get() else 'false'}\n")
+            f.write(f"FOLLOW_USERS={'true' if self.follow_users.get() else 'false'}\n")
 
-# Campos principais
-entrada_user = tk.Entry(janela, width=40)
-entrada_senha = tk.Entry(janela, show="*", width=40)
-entrada_api = tk.Entry(janela, width=40)
-entrada_prompt = tk.Entry(janela, width=40)
-entrada_arquivo = tk.Entry(janela, width=40)
+        env = os.environ.copy()
+        env["PROFILES_FILE"] = self.selected_file_path
+        subprocess.Popen(["python", "src/main.py"], env=env)
 
-var_gpt = tk.BooleanVar()
-var_enviar = tk.BooleanVar()
-var_seguir = tk.BooleanVar()
-
-# Labels e entradas
-campos = [
-    ("Usuário Instagram:", entrada_user),
-    ("Senha Instagram:", entrada_senha),
-    ("Chave OpenAI:", entrada_api),
-    ("Prompt personalizado:", entrada_prompt),
-    ("Arquivo de perfis:", entrada_arquivo),
-]
-
-for i, (label, entry) in enumerate(campos):
-    tk.Label(janela, text=label).grid(row=i, column=0, sticky="w", padx=10, pady=5)
-    entry.grid(row=i, column=1, padx=10)
-
-botao_arquivo = tk.Button(janela, text="Selecionar", command=selecionar_arquivo)
-botao_arquivo.grid(row=4, column=2, padx=5)
-
-# Checkboxes
-tk.Checkbutton(janela, text="Usar GPT", variable=var_gpt).grid(row=5, column=0, sticky="w", padx=10, pady=10)
-tk.Checkbutton(janela, text="Enviar mensagens", variable=var_enviar).grid(row=5, column=1, sticky="w")
-tk.Checkbutton(janela, text="Seguir perfis", variable=var_seguir).grid(row=5, column=2, sticky="w")
-
-# Botões
-botao_salvar = tk.Button(janela, text="Salvar configurações", command=atualizar_env_e_salvar)
-botao_salvar.grid(row=6, column=0, columnspan=2, pady=10)
-
-botao_iniciar = tk.Button(janela, text="Iniciar", command=iniciar_processamento)
-botao_iniciar.grid(row=6, column=2, pady=10)
-
-# Área de logs
-tk.Label(janela, text="Logs:").grid(row=7, column=0, sticky="nw", padx=10)
-texto_logs = scrolledtext.ScrolledText(janela, width=70, height=20)
-texto_logs.grid(row=8, column=0, columnspan=3, padx=10, pady=5)
-
-janela.mainloop()
+if __name__ == "__main__":
+    root = tb.Window()
+    app = DirectIAInterface(root)
+    root.mainloop()
